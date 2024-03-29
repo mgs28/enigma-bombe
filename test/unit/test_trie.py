@@ -36,10 +36,13 @@ def test_trie_inserts_from_file():
     assert not root.contains("asdf")
     assert not root.contains(" ")
     assert not root.contains("")
+    assert root.find_longest_start_word("totally") == "totally"
     assert root.find_longest_start_word("totallym") == "totally"
     assert root.find_longest_start_word("totallm") == ""
     assert root.find_longest_start_word("stotally") == ""
     assert root.find_longest_start_word("matthewwashere") == "matthew"
+    assert root.find_longest_start_word("mattheewashere") == "matt"
+    
     assert root.find_longest_start_word("") == ""
     assert root.tokenize_message_into_words("matthewwas") == ["matthew","w","a","s"]
     assert root.tokenize_message_into_words("matthewwastotally") == ["matthew","w","a","s","totally"]

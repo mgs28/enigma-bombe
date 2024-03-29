@@ -55,23 +55,26 @@ class TrieNode:
         find the longest word that starts the message and is in the trie as a word
         """
         curr_node = self
+        longest_word_candidate = ""
         curr_word = ""
         last_was_end = False
 
+        #print(f"looking at '{message}'")
         for c in message:
+            #print(f"...character={c}, is_end={curr_node.is_end}, longest_word_candidate={longest_word_candidate}, c in children = {c in curr_node.children}")
+            if curr_node.is_end:
+                longest_word_candidate = curr_word
+            
             if c not in curr_node.children:
-                if last_was_end:
-                    return curr_word
-                else:
-                    return ""
+                return longest_word_candidate            
             else:
-                curr_word += c
+                curr_word += c 
                 curr_node = curr_node.children[c]
-                last_was_end = curr_node.is_end
 
-        if last_was_end:
-            return curr_word
-        return ""
+        if curr_node.is_end:
+            longest_word_candidate = curr_word
+
+        return longest_word_candidate
 
     def tokenize_message_into_words(self, message):
         """
