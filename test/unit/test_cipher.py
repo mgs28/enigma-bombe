@@ -124,21 +124,24 @@ def test_long_cipher():
     with open("data/messages.txt", "r", encoding="utf-8") as f: 
         text = f.readline().strip()
         while len(text) > 0:
+
+            #Given 
+            
             #pick a random set of rotors
             rotors = random.choices(all_rotors, k=3)
-
             #pick some random offsets (also called the ring)
             offsets = [random.randint(0, 25) for i in range(1,4) ]
 
+            #When 
+
             #cipher the text
             cipher = cipher_text(text, rotors, offsets)
-
             #decipher the cipher 
             decipher = cipher_text(cipher, rotors, offsets) 
-
             #recipher the decipher text (could be different than original text because of non-alphanumeric characters)
             recipher = cipher_text(decipher, rotors, offsets)
 
+            #Then
             assert cipher == recipher 
 
             #get next text 
