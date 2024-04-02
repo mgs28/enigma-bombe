@@ -145,7 +145,7 @@ def rotate_rotor(rotor):
     return [(i + temp_r[i]) % len(temp_r) for i in range(len(temp_r))]
 
 
-def cipher_text(text, rotors, offsets):
+def cipher_text(text, rotors_in, offsets_in):
     """
     cipher the text with the given set of rotors and offsets
     ex) cipher ("matthewwashere", [RotorD, RotorB, RotorC], [0,0,0])
@@ -155,6 +155,10 @@ def cipher_text(text, rotors, offsets):
     #       all characters in text are ascii.lower()
     ######################
     text = text.lower()
+    #create copies so we don't mess with original rotors, etc
+    rotors = rotors_in.copy()
+    offsets = offsets_in.copy()
+
 
     print(f"Ciphering with rotors = {rotors} and text = {text}")
 

@@ -1,7 +1,7 @@
 import pytest
 
-from enigma_bombe.cipher import cipher_text, inverse_rotor, rotate_rotor 
-
+from enigma_bombe.cipher import cipher_text, inverse_rotor, rotate_rotor, RotorA, RotorB, RotorC, RotorD
+import random 
 
 
 def test_inverse_rotor():
@@ -106,3 +106,42 @@ def test_cipher():
 
     #then
     assert cipher == "matthewwashere"
+
+    ######### TEST MATCHES WITH REACTJS CODE
+    #given
+    text = "matthewwashere"
+
+    #when 
+    cipher = cipher_text(text, [RotorD, RotorB, RotorC], [0,0,0])
+
+    #then
+    assert cipher=="ljffizqqidizpz"
+
+def test_long_cipher():
+    identify = [x for x in range(26)]
+    all_rotors = [RotorA, RotorB, RotorC, RotorD,identify]
+
+    with open("data/messages.txt", "r", encoding="utf-8") as f: 
+        text = f.readline().strip()
+        while len(text) > 0:
+            #pick a random set of rotors
+            rotors = random.choices(all_rotors, k=3)
+
+            #pick some random offsets (also called the ring)
+            offsets = [random.randint(0, 25) for i in range(1,4) ]
+
+            #cipher the text
+            cipher = cipher_text(text, rotors, offsets)
+
+            #decipher the cipher 
+            decipher = cipher_text(cipher, rotors, offsets) 
+
+            #recipher the decipher text (could be different than original text because of non-alphanumeric characters)
+            recipher = cipher_text(decipher, rotors, offsets)
+
+            assert cipher == recipher 
+
+            #get next text 
+            text = f.readline().strip()
+
+
