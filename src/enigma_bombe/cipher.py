@@ -114,7 +114,10 @@ RotorD = [
     25,
 ]
 RotorReflector = [x - 1 if x % 2 == 1 else x + 1 for x in range(26)]
-
+identify = [x for x in range(26)]
+ALL_ROTORS = [RotorA, RotorB, RotorC]
+# wider set of rotors 
+# ALL_ROTORS = [RotorA, RotorB, RotorC, RotorD, identify]
 
 
 
@@ -160,7 +163,7 @@ def cipher_text(text, rotors_in, offsets_in):
     offsets = offsets_in.copy()
 
 
-    print(f"Ciphering with rotors = {rotors} and text = {text}")
+    #print(f"Ciphering with rotors = {rotors}, offset={offsets} and text = {text}")
 
     # calculate the inverse rotors
     inverse_rotors = []

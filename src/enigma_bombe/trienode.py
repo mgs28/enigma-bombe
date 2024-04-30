@@ -85,10 +85,10 @@ class TrieNode:
         i = 0
         r = []
         while i < len(message):
-            print(f"looking at message = {message[i:]}")
+            #print(f"looking at message = {message[i:]}")
             s = self.find_longest_start_word(message[i:])
             if len(s) > 1:
-                print(f"... found {s}")
+                #print(f"... found {s}")
                 i = i + len(s)
                 r.append(s)
             else:
