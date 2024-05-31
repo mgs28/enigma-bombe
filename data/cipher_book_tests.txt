@@ -1,0 +1,15 @@
+﻿The history of war teems with occasions where the interception of
+dispatches and orders written in plain language has resulted in
+defeat and disaster for the force whose intentions thus became known
+at once to the enemy. For this reason, prudent generals have used
+cipher and code messages from time immemorial. The necessity for
+exact expression of ideas practically excludes the use of codes for
+military work although it is possible that a special tactical code
+might be useful for preparation of tactical orders.
+
+It is necessary therefore to fall back on ciphers for general military
+work if secrecy of communication is to be fairly well assured. It
+may as well be stated here that no practicable military cipher is
+mathematically indecipherable if intercepted; the most that can be
+expected is to delay for a longer or shorter time the deciphering of
+the message by the interceptor.

@@ -28,7 +28,11 @@ $ python -m black src/ --check
 
 $ python -m black src/
 
+## Install pytorch tasks
 
+After spacy is installed, download the english model to tokenize 
+
+python -m spacy download en_core_web_sm
 
 ## Dockerized API version
 You can then dockerize the enigma-bombe webapp with 

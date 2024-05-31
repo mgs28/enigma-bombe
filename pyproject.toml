@@ -9,6 +9,10 @@ name = "enigma-bombe"
 version = "1.0.0"
 dependencies = [
     "Flask",
+    "spacy",
+    "torch", 
+    "numpy",
+    "pandas",
 ]
 
 [project.optional-dependencies]
