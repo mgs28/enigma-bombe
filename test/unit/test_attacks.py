@@ -47,7 +47,7 @@ def test_percent_words_score():
     score = attack_vector.percent_words_score(s)
 
     #THEN 
-    assert round(score,5) == 0.85345, "{} != 0.85345".format(s)
+    assert round(score,5) == 0.88846, "{} != 0.88846".format(s)
 
 def test_insert_score():  
     

@@ -14,7 +14,7 @@ class CipherAttack:
 
     def __init__(self):
         self.english_dictionary = TrieNode()
-        self.english_dictionary.load_from_dictionary_file("data/words_alpha.txt")
+        self.english_dictionary.load_from_dictionary_file("data/wordlist.10000.txt")
         self.top_k_settings = []
         self.ALL_ROTORS = ALL_ROTORS
 
@@ -132,6 +132,7 @@ def main():
     
     #pick some random offsets (also called the ring)
     offsets = [random.randint(0, 25) for i in range(1,4) ]
+    
     #Cipher the text 
     c = cipher.cipher_text(text, rotors, offsets)
     print(f"\t cipher = {c}")
@@ -139,18 +140,17 @@ def main():
     print(f"\t offsets={offsets}")
 
     #start deciphering
-    attack_vector = CipherAttack()
+    attack_vector = CipherAttack()    
 
     #simplified and show it the rotors used so we just need to find the offset
-    #attack_vector.attack_ciphertext_only(c, 3, rotors=rotor_indices, score_metric=attack_vector.ioc_score)
+    attack_vector.attack_ciphertext_only(c, 3, rotors=rotor_indices, score_metric=attack_vector.ioc_score)
 
-    attack_vector.attack_ciphertext_only(c, 3, score_metric=attack_vector.ioc_score)  
+    attack_vector.attack_ciphertext_only(c, 3, score_metric=attack_vector.percent_words_score)  
 
     for item in attack_vector.top_k_settings:
         unciphered = cipher.cipher_text(c, item.rotors, item.offset)
         print(f"for {item}")
         print(f"\t{attack_vector.english_dictionary.tokenize_message_into_words(unciphered)}")
-
 
 # Using the special variable
 # __name__

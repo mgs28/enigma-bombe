@@ -114,12 +114,10 @@ RotorD = [
     25,
 ]
 RotorReflector = [x - 1 if x % 2 == 1 else x + 1 for x in range(26)]
-identify = [x for x in range(26)]
+identity = [x for x in range(26)]
 ALL_ROTORS = [RotorA, RotorB, RotorC]
 # wider set of rotors 
 # ALL_ROTORS = [RotorA, RotorB, RotorC, RotorD, identify]
-
-
 
 def inverse_rotor(rotor):
     """
@@ -155,9 +153,20 @@ def cipher_text(text, rotors_in, offsets_in):
     """
     ######################
     # TODO: Add error checks (e.g. len(rotors)=len(offsets)), 
-    #       all characters in text are ascii.lower()
     ######################
+
+    # Clean up the string so it is only ascii_lowercase 
     text = text.lower()
+    slimmed_test = ""
+    for character in text:
+        if character in string.ascii_lowercase:
+            slimmed_test = slimmed_test + character 
+    text = slimmed_test
+
+    #if no rotors or offset then return unciphered text 
+    if rotors_in is None or offsets_in is None:
+        return text 
+
     #create copies so we don't mess with original rotors, etc
     rotors = rotors_in.copy()
     offsets = offsets_in.copy()

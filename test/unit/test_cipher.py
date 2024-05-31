@@ -1,6 +1,6 @@
 import pytest
 
-from enigma_bombe.cipher import cipher_text, inverse_rotor, rotate_rotor, ALL_ROTORS, RotorD, RotorB, RotorC
+from enigma_bombe.cipher import cipher_text, inverse_rotor, rotate_rotor, ALL_ROTORS, RotorD, RotorB, RotorC, identity
 import random 
 
 
@@ -75,7 +75,6 @@ def test_cipher():
     ##### TEST A SIMPLE CIPHERING
 
     #given 
-    identity = [x for x in range(26)]
     AtoBandBtoA = [1,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
     text = "at"
 
