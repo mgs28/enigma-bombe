@@ -1,10 +1,14 @@
-#import torch
-#torch.utils.data.datapipes.utils.common.DILL_AVAILABLE = torch.utils._import_utils.dill_available()
+from enigma_bombe.cipher import cipher_text 
+from enigma_bombe.cipher import identity, RotorA
 
 import spacy
 import pandas as pd 
 from pathlib import Path
-from enigma_bombe.cipher import cipher_text 
+
+import torch 
+torch.utils.data.datapipes.utils.common.DILL_AVAILABLE = torch.utils._import_utils.dill_available() #some error on macOS forces this
+from torch import nn
+from torch.utils.data import DataLoader
 
 class CipherDataSet: 
 
@@ -54,7 +58,7 @@ class CipherDataSet:
                 #create all versions of this text 
                 for i in range(len(self.labels_text)):
                     cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                    temp = {'class':self.labels_text[i], 'text':cipher}
+                    temp = pd.Series([self.labels_text[i]] + list(cipher) + ([None]*(self.message_length-len(cipher))))
                     dataset.append(temp)
 
                 buffer = sent.text[0:self.message_length]
@@ -62,16 +66,29 @@ class CipherDataSet:
         if buffer != "":
             for i in range(len(self.labels_text)):
                 cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                temp = {'class':self.labels_text[i], 'text':cipher}
+                temp = pd.Series([self.labels_text[i]] + list(cipher) + ([None]*(self.message_length-len(cipher))))
                 dataset.append(temp)
 
+        #df = pd.DataFrame(dataset, columns = ['class'] + list(range(self.message_length)))
+        
         df = pd.DataFrame(dataset)
+        df.rename(columns={0: 'class'}, inplace=True)
 
         return df 
 
-    def engTokenize(self, text:str) ->list[str]:
-        """
-        Tokenize an English text and return a list of tokens
-        """
-        return [token.text for token in self.eng.tokenizer(text)]
+    def learnClasses(self, train_df:pd.DataFrame):
+        tensor = torch.tensor(train_df.values)
 
+if __name__ == "__main__":#
+
+    cds = CipherDataSet(message_length=250, filename="data/cipher_book_tests.txt")
+    cds.add_class("identity", rotors=[identity, identity, identity], offset=[0,0,0])
+    cds.add_class("none", rotors=None, offset=None)    
+
+    df = cds.createDataset() 
+    print(f"The shape is {df.shape}")
+    print(df.head())
+
+    x = df.iloc[0]
+    print("".join(str(a) if a else '' for a in x[1:].tolist()))
+    df.to_csv("data/all.data")
