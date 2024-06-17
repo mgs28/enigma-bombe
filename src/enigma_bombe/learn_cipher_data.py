@@ -1,29 +1,24 @@
 from enigma_bombe.cipher import cipher_text 
 from enigma_bombe.cipher import identity, RotorA
 
+import shutil
 import spacy
-import pandas as pd 
 from pathlib import Path
-
-import torch 
-torch.utils.data.datapipes.utils.common.DILL_AVAILABLE = torch.utils._import_utils.dill_available() #some error on macOS forces this
-from torch import nn
-from torch.utils.data import DataLoader
 
 class CipherDataSet: 
 
-    def __init__(self, message_length:int = 200, filename:str = "data/cipher_book_shortened.txt"):
+    def __init__(self, message_length:int = 200):
         self.message_length = message_length
-        self.filename = filename
 
         self.nlp = spacy.load("en_core_web_sm") # Load the English model to tokenize English text
+        self.nlp.max_length = 1500000
 
         #classes
         self.labels_text = []
         self.rotors = []
         self.offsets = [] 
 
-        self.df = pd.DataFrame()
+        self.dataset = {}
 
     def add_class(self, label:str, rotors:list, offset:list): 
         """
@@ -33,17 +28,18 @@ class CipherDataSet:
         self.rotors.append(rotors)
         self.offsets.append(offset)
 
-    def createDataset(self) -> pd.DataFrame:
+        self.dataset[label] = list()
+    
+    def append_examples(self, filename:str): 
         """
         Create the dataset using the specified text and classes
         """
-
-        p = Path(self.filename)
+        print(f"processing {filename}")
+        p = Path(filename)
         str = p.read_text()
 
         doc = self.nlp(str)
         buffer = ""
-        dataset = [] 
         
         for sent in doc.sents:
             if buffer == "" and len(sent.text) > self.message_length:
@@ -58,37 +54,37 @@ class CipherDataSet:
                 #create all versions of this text 
                 for i in range(len(self.labels_text)):
                     cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                    temp = pd.Series([self.labels_text[i]] + list(cipher) + ([None]*(self.message_length-len(cipher))))
-                    dataset.append(temp)
+                    self.dataset[self.labels_text[i]].append(cipher) 
 
                 buffer = sent.text[0:self.message_length]
         
         if buffer != "":
             for i in range(len(self.labels_text)):
                 cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                temp = pd.Series([self.labels_text[i]] + list(cipher) + ([None]*(self.message_length-len(cipher))))
-                dataset.append(temp)
+                self.dataset[self.labels_text[i]].append(cipher) 
 
-        #df = pd.DataFrame(dataset, columns = ['class'] + list(range(self.message_length)))
-        
-        df = pd.DataFrame(dataset)
-        df.rename(columns={0: 'class'}, inplace=True)
+    def write_dataset(self, data_directory:str): 
+        datadir = Path(data_directory)
 
-        return df 
+        #clean out the old directory
+        shutil.rmtree(data_directory)
+        datadir.mkdir(parents=True, exist_ok=True)
 
-    def learnClasses(self, train_df:pd.DataFrame):
-        tensor = torch.tensor(train_df.values)
+        for key in self.dataset:
+            f = open(str(datadir.absolute()) + "/" + f"{key}.txt", "a")
+            for line in self.dataset[key]:
+                f.write(line + "\n")
+            f.close() 
 
-if __name__ == "__main__":#
 
-    cds = CipherDataSet(message_length=250, filename="data/cipher_book_tests.txt")
+if __name__ == "__main__":
+
+    cds = CipherDataSet(message_length=250)
     cds.add_class("identity", rotors=[identity, identity, identity], offset=[0,0,0])
     cds.add_class("none", rotors=None, offset=None)    
 
-    df = cds.createDataset() 
-    print(f"The shape is {df.shape}")
-    print(df.head())
+    cds.append_examples("data/cipher_book_full.txt") 
+    cds.append_examples("data/moby.dick.txt")
+    
+    cds.write_dataset("data/learning")
 
-    x = df.iloc[0]
-    print("".join(str(a) if a else '' for a in x[1:].tolist()))
-    df.to_csv("data/all.data")
