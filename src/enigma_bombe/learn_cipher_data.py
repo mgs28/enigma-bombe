@@ -5,10 +5,14 @@ import shutil
 import spacy
 from pathlib import Path
 
-class CipherDataSet: 
+import torch
+from torch.utils.data import Dataset
 
-    def __init__(self, message_length:int = 200):
+class CipherDataSetGenerator: 
+
+    def __init__(self, message_length:int = 200, message_length_min:int = 30):
         self.message_length = message_length
+        self.message_length_min = message_length_min
 
         self.nlp = spacy.load("en_core_web_sm") # Load the English model to tokenize English text
         self.nlp.max_length = 1500000
@@ -34,7 +38,7 @@ class CipherDataSet:
         """
         Create the dataset using the specified text and classes
         """
-        print(f"processing {filename}")
+        print(f"...processing {filename}")
         p = Path(filename)
         str = p.read_text()
 
@@ -50,18 +54,20 @@ class CipherDataSet:
                 buffer = buffer + sent.text
             else:
                 #we have reached buffer size 
-
-                #create all versions of this text 
-                for i in range(len(self.labels_text)):
-                    cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                    self.dataset[self.labels_text[i]].append(cipher) 
+                
+                if len(buffer) > self.message_length_min: 
+                    #create all versions of this text 
+                    for i in range(len(self.labels_text)):
+                        cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
+                        self.dataset[self.labels_text[i]].append(cipher) 
 
                 buffer = sent.text[0:self.message_length]
         
         if buffer != "":
-            for i in range(len(self.labels_text)):
-                cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
-                self.dataset[self.labels_text[i]].append(cipher) 
+            if len(buffer) > self.message_length_min: 
+                for i in range(len(self.labels_text)):
+                    cipher = cipher_text(buffer, self.rotors[i], self.offsets[i])
+                    self.dataset[self.labels_text[i]].append(cipher) 
 
     def write_dataset(self, data_directory:str): 
         datadir = Path(data_directory)
@@ -76,10 +82,10 @@ class CipherDataSet:
                 f.write(line + "\n")
             f.close() 
 
-
+    
 if __name__ == "__main__":
 
-    cds = CipherDataSet(message_length=250)
+    cds = CipherDataSetGenerator(message_length=250)
     cds.add_class("identity", rotors=[identity, identity, identity], offset=[0,0,0])
     cds.add_class("none", rotors=None, offset=None)    
 
