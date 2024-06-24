@@ -1,4 +1,4 @@
-from enigma_bombe.learn_cipher_data import CipherDataSetGenerator 
+from enigma_bombe.learn_cipher_data import CipherDatasetGenerator 
 import enigma_bombe.learn_cipher_rnn
 from enigma_bombe.cipher import identity, RotorA
 
@@ -6,7 +6,7 @@ import torch
 
 def test_pd_dataset():
     #Given 
-    cds = CipherDataSetGenerator(message_length=250)
+    cds = CipherDatasetGenerator(message_length=250)
     cds.add_class("identity", rotors=[identity, identity, identity], offset=[0,0,0])
     cds.add_class("none", rotors=None, offset=None)    
 
