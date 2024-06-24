@@ -1,14 +1,18 @@
 from enigma_bombe.cipher import cipher_text 
 from enigma_bombe.cipher import identity, RotorA
 
+import glob
+import os
 import shutil
 import spacy
+
 from pathlib import Path
+from io import open
 
 import torch
 from torch.utils.data import Dataset
 
-class CipherDataSetGenerator: 
+class CipherDatasetGenerator: 
 
     def __init__(self, message_length:int = 200, message_length_min:int = 30):
         self.message_length = message_length
@@ -79,18 +83,18 @@ class CipherDataSetGenerator:
         for key in self.dataset:
             f = open(str(datadir.absolute()) + "/" + f"{key}.txt", "a")
             for line in self.dataset[key]:
-                f.write(line + "\n")
+                if len(line) >= self.message_length_min and len(line) < self.message_length:
+                    f.write(line + "\n")
             f.close() 
 
-    
 if __name__ == "__main__":
 
-    cds = CipherDataSetGenerator(message_length=250)
+    cds = CipherDatasetGenerator(message_length=250)
     cds.add_class("identity", rotors=[identity, identity, identity], offset=[0,0,0])
     cds.add_class("none", rotors=None, offset=None)    
 
     cds.append_examples("data/cipher_book_full.txt") 
-    cds.append_examples("data/moby.dick.txt")
+    #cds.append_examples("data/moby.dick.txt")
     
     cds.write_dataset("data/learning")
 
